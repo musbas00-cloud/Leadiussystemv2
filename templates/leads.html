@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mina Leads - Swedish Lead Generation API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1a1a1a;
+            padding: 20px;
+            border-right: 1px solid #333;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            color: #ff6b35;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo-img {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+            max-width: 150px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #ff6b35;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover {
+            background: #252525;
+            color: #e0e0e0;
+        }
+        
+        .nav-item.active {
+            background: #ff6b35;
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-icon {
+            width: 36px;
+            height: 36px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .header-icon:hover {
+            background: #252525;
+            color: #e0e0e0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            color: #ff6b35;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        .stat-sub {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .chart-card {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        
+        .chart-title {
+            color: #e0e0e0;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .donut-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #ff6b35 0% 60%,
+                #666 60% 75%,
+                #444 75% 90%,
+                #222 90% 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-center {
+            width: 80px;
+            height: 80px;
+            background: #0f0f0f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.ny { background: #ff6b35; }
+        .legend-dot.kontaktad { background: #666; }
+        .legend-dot.konverterad { background: #444; }
+        .legend-dot.borttagen { background: #222; }
+        
+        .leads-list {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        
+        .list-title {
+            color: #e0e0e0;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .lead-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .lead-item:last-child {
+            border-bottom: none;
+        }
+        
+        .lead-info {
+            flex: 1;
+        }
+        
+        .lead-name {
+            color: #e0e0e0;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .lead-company {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .lead-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 15px;
+        }
+        
+        .lead-status.ny {
+            background: #ff6b35;
+            color: white;
+        }
+        
+        .lead-status.kontaktad {
+            background: #666;
+            color: white;
+        }
+        
+        .lead-status.konverterad {
+            background: #444;
+            color: white;
+        }
+        
+        .lead-status.borttagen {
+            background: #222;
+            color: #999;
+        }
+        
+        .btn-view {
+            background: #252525;
+            color: #e0e0e0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-view:hover {
+            background: #333;
+        }
+        
+        .quick-actions {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        
+        .actions-title {
+            color: #e0e0e0;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background: #e55a2b;
+        }
+        
+        .btn-secondary {
+            background: #252525;
+            color: #e0e0e0;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background: #333;
+        }
+        
+        .api-key-input {
+            background: #252525;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Leadius" class="logo-img">
+            </div>
+            
+            <div class="nav-item active">
+                <span>🏠</span>
+                <span>Hem / Översikt</span>
+            </div>
+            
+            <div class="nav-item" onclick="showGenerateLeads()">
+                <span>➕</span>
+                <span>Generera Leads</span>
+            </div>
+            
+            <div class="nav-item" onclick="showMyLeads()">
+                <span>📄</span>
+                <span>Mina Leads</span>
+            </div>
+            
+            <div class="nav-item">
+                <span>📊</span>
+                <span>Rapporter</span>
+            </div>
+            
+            <div class="nav-item">
+                <span>☑️</span>
+                <span>Mallar</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1 style="color: #e0e0e0;">Översikt</h1>
+                <div class="header-icons">
+                    <div class="header-icon">⚙️</div>
+                    <div class="header-icon">👤</div>
+                    <div class="header-icon" onclick="refreshData()">🔄</div>
+                </div>
+            </div>
+            
+            <div style="color: #999; margin-bottom: 20px; text-align: right;">
+                <span id="user-email"></span> | <a href="/logout" style="color: #ff6b35; text-decoration: none;">Logga ut</a>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Nya Leads Idag</div>
+                    <div class="stat-value" id="leads-today">0</div>
+                    <div class="stat-sub">Totala Leads: <span id="total-leads">0</span></div>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">Leads efter status</div>
+                <div class="chart-container">
+                    <div class="donut-chart">
+                        <div class="chart-center" id="chart-center">0</div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot ny"></div>
+                            <span style="color: #999;">Ny</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot kontaktad"></div>
+                            <span style="color: #999;">Kontaktad</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot konverterad"></div>
+                            <span style="color: #999;">Konverterad</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot borttagen"></div>
+                            <span style="color: #999;">Borttagen</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="leads-list">
+                <div class="list-title">Senaste genererade Leads</div>
+                <div id="recent-leads">
+                    <div style="color: #999; text-align: center; padding: 20px;">Laddar leads...</div>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <div class="actions-title">Snabbåtgärder</div>
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="generateLeads()">Generera nytt lead</button>
+                    <button class="btn-secondary" onclick="showMyLeads()">Visa alla leads</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function loadDashboard() {
+            // Load stats
+            fetch('/api/lead-stats')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        if (data.error === 'Not logged in') {
+                            window.location.href = '/';
+                        }
+                        alert(data.error);
+                        return;
+                    }
+                    
+                    document.getElementById('leads-today').textContent = data.leads_today || 0;
+                    document.getElementById('total-leads').textContent = data.total_leads || 0;
+                    document.getElementById('chart-center').textContent = data.total_leads || 0;
+                    
+                    // Update recent leads
+                    const recentLeadsDiv = document.getElementById('recent-leads');
+                    if (data.recent_leads && data.recent_leads.length > 0) {
+                        recentLeadsDiv.innerHTML = data.recent_leads.map(lead => `
+                            <div class="lead-item">
+                                <div class="lead-info">
+                                    <div class="lead-name">${lead.company_name || 'Okänt företag'}</div>
+                                    <div class="lead-company">${lead.location || 'Sverige'}</div>
+                                </div>
+                                <span class="lead-status ${lead.status.toLowerCase()}">${lead.status}</span>
+                                <button class="btn-view">Visa</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        recentLeadsDiv.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">Inga leads ännu. Klicka på "Generera nytt lead" för att börja!</div>';
+                    }
+                })
+                .catch(err => console.error('Error loading stats:', err));
+        }
+        
+        function generateLeads() {
+            const count = prompt('Hur många leads vill du generera?', '10');
+            if (!count) return;
+            
+            fetch('/api/generate-leads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ count: parseInt(count) })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(`Genererade ${data.leads_generated} leads! Krediter kvar: ${data.credits_remaining}`);
+                    loadDashboard();
+                }
+            })
+            .catch(err => console.error('Error generating leads:', err));
+        }
+        
+        function showMyLeads() {
+            window.location.href = '/leads';
+        }
+        
+        function showGenerateLeads() {
+            generateLeads();
+        }
+        
+        function refreshData() {
+            loadDashboard();
+        }
+        
+        // Load dashboard on page load
+        window.addEventListener('load', function() {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>
+
