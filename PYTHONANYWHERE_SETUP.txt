@@ -1,0 +1,58 @@
+PYTHONANYWHERE - FREE DEPLOYMENT (NO CREDIT CARD NEEDED)
+
+1. Go to: https://www.pythonanywhere.com
+2. Click "Sign up for free" (top right)
+3. Create account with email/password
+4. After signup, you'll see the dashboard
+
+STEP 1: CREATE WEB APP
+- Click "Web" tab (top menu)
+- Click "Add a new web app"
+- Choose "Flask"
+- Select Python 3.10
+- Click "Next" → "Next" → "All set!"
+
+STEP 2: UPLOAD FILES
+- Click "Files" tab
+- Navigate to: /home/yourusername/mysite/
+- Upload these files:
+  * app.py
+  * requirements.txt
+- Create folder: templates/
+  * Upload: login.html, register.html, leads.html
+- Create folder: static/
+  * Create subfolder: images/
+  * Upload all logo images
+
+STEP 3: INSTALL DEPENDENCIES
+- Click "Consoles" tab
+- Click "Bash" (or "Python 3.10")
+- Run: pip3.10 install --user -r requirements.txt
+- Wait for installation
+
+STEP 4: CONFIGURE APP
+- Go back to "Web" tab
+- Click on your web app name
+- In "Source code" section:
+  * Source code: /home/yourusername/mysite/
+  * Working directory: /home/yourusername/mysite/
+- Click "WSGI configuration file" link
+- Replace content with:
+  import sys
+  path = '/home/yourusername/mysite'
+  if path not in sys.path:
+      sys.path.append(path)
+  from app import app as application
+- Click "Save"
+
+STEP 5: SET ENVIRONMENT VARIABLE
+- In "Web" tab, scroll to "Environment variables"
+- Add: PAYPAL_EMAIL = reveriopaypal@gmail.com
+- Click "Add"
+
+STEP 6: RELOAD
+- Click green "Reload" button
+- Your site is live at: https://yourusername.pythonanywhere.com
+
+DONE! Your app is live and FREE forever!
+

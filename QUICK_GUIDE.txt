@@ -1,0 +1,60 @@
+LEADIUS SYSTEM - QUICK GUIDE
+============================
+
+✅ REGISTRATION: WORKING!
+✅ LOGIN: WORKING!
+
+📋 HOW TO ADD CREDITS (FOR TESTING):
+====================================
+
+1. Log in to your account on: https://Leadius.pythonanywhere.com
+2. Visit: https://Leadius.pythonanywhere.com/admin
+3. Click "Get My User Info" button
+4. Enter number of credits (e.g., 100)
+5. Click "Add Credits"
+6. Done! You now have credits to generate leads.
+
+🔄 WHEN LEADS ARE GENERATED:
+============================
+
+1. AUTOMATIC: Every 30 minutes (background process)
+2. MANUAL: Visit https://Leadius.pythonanywhere.com/update
+   - This will immediately scrape and add new leads
+
+📝 HOW TO TEST LEAD GENERATION:
+================================
+
+1. Add credits using /admin page (see above)
+2. Log in to your dashboard
+3. Click "Generera nytt lead" (Generate new lead)
+4. Select how many leads you want (uses 1 credit per lead)
+5. View your leads in the dashboard
+
+🖼️ LOGO ISSUE:
+==============
+
+The logo might not show because:
+- Static files need to be configured in PythonAnywhere
+- Logo file might not be uploaded correctly
+
+TO FIX LOGO:
+1. In PythonAnywhere "Web" tab
+2. Find "Static files" section
+3. Add mapping:
+   URL: /static/
+   Directory: /home/Leadius/mysite/static/
+4. Click "Add"
+5. Reload the web app
+
+OR check if logo.png exists in:
+/home/Leadius/mysite/static/images/logo.png
+
+📦 FILES TO UPLOAD (Updated):
+============================
+
+After making changes, upload these files to PythonAnywhere:
+- app.py (updated with credit system)
+- templates/admin_add_credits.html (new file)
+
+Then reload the web app.
+

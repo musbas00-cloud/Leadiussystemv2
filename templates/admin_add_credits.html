@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Credits - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #e55a2b;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Credits to Account</h1>
+        
+        <div class="info">
+            <strong>Step 1:</strong> First, log in to your account on the main site.<br>
+            <strong>Step 2:</strong> Then come back here and click "Get My User Info" to get your User ID.
+        </div>
+        
+        <button onclick="getUserInfo()">Get My User Info</button>
+        <div id="userInfo"></div>
+        
+        <hr>
+        
+        <h2>Add Credits</h2>
+        <input type="number" id="userId" placeholder="User ID (get it above)" required>
+        <input type="number" id="credits" placeholder="Number of credits to add" value="100" required>
+        <button onclick="addCredits()">Add Credits</button>
+        
+        <div id="result"></div>
+        
+        <hr style="margin: 30px 0;">
+        
+        <h2>Load Excel Files</h2>
+        <div class="info">
+            <strong>Load leads from Excel files:</strong><br>
+            Click the button below to manually load all leads from Excel files in the Leads folder.
+        </div>
+        <button onclick="loadExcel()">Load Leads from Excel Files</button>
+        <div id="excelResult"></div>
+        
+        <hr style="margin: 30px 0;">
+        
+        <h2>Check Lead Status</h2>
+        <button onclick="checkLeads()">Check Available Leads</button>
+        <div id="leadsStatus"></div>
+    </div>
+    
+    <script>
+        async function getUserInfo() {
+            try {
+                // Get current admin user info
+                const response = await fetch('/admin/get-admin-info');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('userInfo').innerHTML = `
+                        <div class="result success">
+                            <strong>Your Account Info:</strong><br>
+                            User ID: <strong>${data.user_id}</strong><br>
+                            Email: ${data.email}<br>
+                            Current Credits: <strong>${data.credits}</strong>
+                        </div>
+                    `;
+                    document.getElementById('userId').value = data.user_id;
+                } else {
+                    document.getElementById('userInfo').innerHTML = `
+                        <div class="result error">
+                            ${data.error || 'Please log in first on the main site, then refresh this page.'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="result error">
+                        Error: ${error.message}<br>
+                        Make sure you're logged in on the main site first!
+                    </div>
+                `;
+            }
+        }
+        
+        async function addCredits() {
+            const userId = document.getElementById('userId').value;
+            const credits = document.getElementById('credits').value;
+            
+            if (!userId || !credits) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">Please fill in both fields</div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/add-credits', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        credits: parseInt(credits)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result success">
+                            <strong>Success!</strong><br>
+                            ${data.message}<br>
+                            New total credits: <strong>${data.credits}</strong>
+                        </div>
+                    `;
+                    // Refresh user info
+                    getUserInfo();
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result error">
+                            Error: ${data.error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadExcel() {
+            try {
+                const response = await fetch('/admin/load-excel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let logHtml = '';
+                    if (data.log && data.log.length > 0) {
+                        logHtml = '<pre style="font-size: 11px; overflow: auto; max-height: 300px; background: #f0f0f0; padding: 10px; border-radius: 5px;">' + data.log.join('\n') + '</pre>';
+                    }
+                    document.getElementById('excelResult').innerHTML = `
+                        <div class="result success">
+                            <strong>Success!</strong><br>
+                            ${data.message}<br>
+                            Leads loaded: <strong>${data.leads_loaded}</strong>
+                            ${logHtml}
+                        </div>
+                    `;
+                    // Refresh lead status
+                    checkLeads();
+                } else {
+                    let logHtml = '';
+                    if (data.log && data.log.length > 0) {
+                        logHtml = '<pre style="font-size: 11px; overflow: auto; max-height: 300px; background: #f0f0f0; padding: 10px; border-radius: 5px;">' + data.log.join('\n') + '</pre>';
+                    }
+                    document.getElementById('excelResult').innerHTML = `
+                        <div class="result error">
+                            <strong>Error:</strong><br>
+                            ${data.error || 'Unknown error'}<br>
+                            ${data.traceback ? '<pre style="font-size: 10px; overflow: auto;">' + data.traceback + '</pre>' : ''}
+                            ${logHtml}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('excelResult').innerHTML = `
+                    <div class="result error">
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function checkLeads() {
+            try {
+                const response = await fetch('/admin/check-leads');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('leadsStatus').innerHTML = `
+                        <div class="result success">
+                            <strong>Lead Status:</strong><br>
+                            Total leads: <strong>${data.total_leads}</strong><br>
+                            Leads with phone: <strong>${data.leads_with_phone}</strong><br>
+                            Available (unlocked): <strong>${data.available_leads}</strong><br>
+                            Locked: <strong>${data.locked_leads}</strong><br>
+                            Assigned: <strong>${data.assigned_leads}</strong>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('leadsStatus').innerHTML = `
+                        <div class="result error">
+                            Error checking leads
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('leadsStatus').innerHTML = `
+                    <div class="result error">
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Check leads on page load
+        checkLeads();
+    </script>
+</body>
+</html>
+
